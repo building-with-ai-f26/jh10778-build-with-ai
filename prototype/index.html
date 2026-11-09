@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hidden Shelf · Prototype</title>
+<style>
+  :root { --bg:#f7f3ec; --card:#fffdf8; --ink:#2b2420; --muted:#7a6e64; --line:#e4dacb; --accent:#8a3b2e; --chip:#f1e6d6; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family: Georgia, "Times New Roman", serif; line-height:1.55; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
+  h1 { font-size: 34px; margin: 0 0 4px; letter-spacing:-0.01em; }
+  .sub { color: var(--muted); margin: 0 0 28px; font-style: italic; }
+  .card { background: var(--card); border:1px solid var(--line); border-radius: 12px; padding: 22px 24px; margin-bottom: 20px; }
+  .step { font: 600 12px/1 -apple-system, "Segoe UI", sans-serif; letter-spacing:.08em; text-transform:uppercase; color: var(--accent); margin-bottom: 8px; }
+  h2 { font-size: 20px; margin: 0 0 12px; }
+  label { display:block; font: 600 14px -apple-system, "Segoe UI", sans-serif; margin: 14px 0 6px; }
+  input, textarea { width:100%; padding: 10px 12px; border:1px solid var(--line); border-radius:8px; font: 15px Georgia, serif; background:#fff; color:var(--ink); }
+  textarea { min-height: 80px; resize: vertical; }
+  .row3 { display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media (max-width: 600px) { .row3 { grid-template-columns: 1fr; } }
+  button { background: var(--accent); color:#fff; border:0; border-radius:8px; padding: 10px 18px; font: 600 15px -apple-system, "Segoe UI", sans-serif; cursor:pointer; margin-top: 14px; }
+  button.secondary { background: transparent; color: var(--accent); border:1px solid var(--accent); }
+  button:disabled { opacity:.5; cursor: default; }
+  .results { display:grid; gap: 12px; margin-top: 12px; }
+  .book { display:flex; gap: 14px; padding: 12px; border:1px solid var(--line); border-radius: 10px; background:#fff; }
+  .book.pick { cursor:pointer; }
+  .book.pick:hover, .book.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(138,59,46,.12); }
+  .cover { width: 58px; min-width:58px; height: 86px; border-radius: 4px; background: var(--chip) center/cover no-repeat; display:flex; align-items:center; justify-content:center; font-size: 22px; color: var(--muted); }
+  .book h3 { margin: 0; font-size: 17px; }
+  .by { color: var(--muted); font-size: 14px; }
+  .why { font: 13px/1.5 -apple-system, "Segoe UI", sans-serif; margin-top: 6px; }
+  .chip { display:inline-block; background: var(--chip); border-radius: 999px; padding: 2px 9px; margin: 3px 4px 0 0; font: 12px -apple-system, "Segoe UI", sans-serif; }
+  .note { font: 13px -apple-system, "Segoe UI", sans-serif; color: var(--muted); margin-top: 10px; }
+  .review { border-left: 3px solid var(--accent); padding-left: 14px; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Hidden Shelf</h1>
+  <p class="sub">Tell us how a book moved you. We'll find the ones the bestseller lists never show you.</p>
+
+  <!-- STEP 1 -->
+  <div class="card">
+    <div class="step">Step 1</div>
+    <h2>A book you loved</h2>
+    <input id="q" placeholder="e.g. Kitchen, Banana Yoshimoto" />
+    <button id="searchBtn">Find this book</button>
+    <div id="searchResults" class="results"></div>
+    <p id="searchNote" class="note"></p>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="card" id="step2">
+    <div class="step">Step 2</div>
+    <h2>Your reflection (the review template)</h2>
+    <label>Three words that describe this book</label>
+    <div class="row3">
+      <input id="a1" placeholder="quiet" />
+      <input id="a2" placeholder="melancholy" />
+      <input id="a3" placeholder="healing" />
+    </div>
+    <label>The one story or moment you still remember</label>
+    <textarea id="story" placeholder="The midnight scene in the kitchen where..."></textarea>
+    <label>What did this book change in you? (optional)</label>
+    <textarea id="change" placeholder="It made me..."></textarea>
+    <button id="recBtn">Find my hidden gems</button>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="card hidden" id="step3">
+    <div class="step">Step 3</div>
+    <h2>Your review card</h2>
+    <div id="reviewCard" class="review"></div>
+    <h2 style="margin-top:22px">5 hidden gems for you</h2>
+    <div id="recs" class="results"></div>
+    <p id="recNote" class="note"></p>
+  </div>
+</div>
+
+<script>
+// ---------- Config ----------
+const OL = "https://openlibrary.org/search.json";
+const FIELDS = "key,title,author_name,first_publish_year,cover_i,subject,readinglog_count,ratings_average,ratings_count";
+const POPULAR_LIMIT = 500; // readers who logged it on Open Library; above this = "already famous"
+// Open Library tags books that hit the New York Times list ("nyt:..." / "New York Times bestseller")
+const BESTSELLER = /^nyt:|best ?seller/i;
+// Keep literature; drop picture books, children's books and self-help
+const LITERARY = /fiction|novel|short stories|poetry|literature/i;
+const NOT_LITERARY = /juvenile|picture book|children|self-help|self-actualization|psychotherapy/i;
+
+// Adjectives -> Open Library subjects
+const MOOD_TO_SUBJECT = {
+  quiet:"Solitude", lonely:"Loneliness", melancholy:"Grief", sad:"Grief",
+  healing:"Healing", warm:"Friendship", heartwarming:"Friendship",
+  funny:"Humor", dark:"Psychological fiction",
+  romantic:"Love", mysterious:"Mystery",
+  magical:"Magic realism", surreal:"Magic realism",
+  nostalgic:"Memory", family:"Families",
+  poetic:"Poetry", hopeful:"Hope",
+  philosophical:"Philosophy", "coming-of-age":"Coming of age",
+  nature:"Nature"
+};
+
+// Subjects that say nothing about taste
+const GENERIC = /^(fiction|general|accessible book|protected daisy|in library|large type books|lending library|open library staff picks|english literature|american literature|translations into english|fiction, general|nyt:|reading level|literature|novel|long now)/i;
+
+// Offline sample (used only if Open Library can't be reached)
+const SAMPLE = [
+  ["The Summer Book","Tove Jansson",1972,["Solitude","Nature","Families","Grief","Memory"]],
+  ["A Month in the Country","J. L. Carr",1980,["Solitude","Memory","Healing","Nature"]],
+  ["Territory of Light","Yuko Tsushima",1979,["Loneliness","Families","Healing"]],
+  ["The Hearing Trumpet","Leonora Carrington",1974,["Magic realism","Humor","Friendship"]],
+  ["Lolly Willowes","Sylvia Townsend Warner",1926,["Magic realism","Solitude","Humor"]],
+  ["Mrs. Bridge","Evan S. Connell",1959,["Families","Loneliness","Humor"]],
+  ["Pedro Páramo","Juan Rulfo",1955,["Magic realism","Grief","Memory"]],
+  ["84, Charing Cross Road","Helene Hanff",1970,["Friendship","Humor","Love","Books and reading"]],
+  ["Snow Country","Yasunari Kawabata",1948,["Love","Loneliness","Poetry","Nature"]],
+  ["The Makioka Sisters","Jun'ichirō Tanizaki",1948,["Families","Memory","Love"]],
+  ["Speedboat","Renata Adler",1976,["Humor","Loneliness","Psychological fiction"]],
+  ["Train Dreams","Denis Johnson",2011,["Grief","Nature","Solitude","Memory"]],
+  ["The Memory Police","Yoko Ogawa",1994,["Memory","Psychological fiction","Loneliness"]],
+  ["Jesus' Son","Denis Johnson",1992,["Psychological fiction","Hope","Healing"]],
+  ["Gilead","Marilynne Robinson",2004,["Families","Hope","Philosophy","Memory"]],
+  ["Kitchen","Banana Yoshimoto",1988,["Grief","Healing","Families","Loneliness"]],
+  ["The Sea, the Sea","Iris Murdoch",1978,["Love","Psychological fiction","Memory","Philosophy"]],
+  ["Sula","Toni Morrison",1973,["Friendship","Families","Coming of age"]]
+].map(([title, author, year, subjects]) => ({ title, author_name:[author], first_publish_year:year, subject:subjects, sample:true }));
+
+// ---------- State ----------
+let chosen = null;      // the book the user loved
+let offline = false;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+async function olSearch(params) {
+  const url = OL + "?" + new URLSearchParams({ ...params, fields: FIELDS }).toString();
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Open Library error " + res.status);
+  return (await res.json()).docs || [];
+}
+
+function coverHtml(b) {
+  return b.cover_i
+    ? `<div class="cover" style="background-image:url(https://covers.openlibrary.org/b/id/${b.cover_i}-M.jpg)"></div>`
+    : `<div class="cover">📖</div>`;
+}
+
+function tasteSubjects(book) {
+  return (book.subject || []).filter(s => !GENERIC.test(s) && s.length < 40).slice(0, 4);
+}
+
+// ---------- Step 1: find the book ----------
+$("searchBtn").onclick = async () => {
+  const q = $("q").value.trim();
+  if (!q) return;
+  $("searchResults").innerHTML = "";
+  $("searchNote").textContent = "Searching Open Library…";
+  try {
+    const docs = (await olSearch({ q, limit: 5 })).slice(0, 4);
+    offline = false;
+    $("searchNote").textContent = docs.length ? "Pick the right edition:" : "No match. Try title + author.";
+    docs.forEach(b => {
+      const el = document.createElement("div");
+      el.className = "book pick";
+      el.innerHTML = `${coverHtml(b)}<div><h3>${esc(b.title)}</h3><div class="by">${esc((b.author_name||[]).join(", "))} · ${esc(b.first_publish_year||"")}</div>
+        <div>${tasteSubjects(b).map(s => `<span class="chip">${esc(s)}</span>`).join("")}</div></div>`;
+      el.onclick = () => { chosen = b; document.querySelectorAll(".book.pick").forEach(x => x.classList.remove("selected")); el.classList.add("selected"); };
+      $("searchResults").appendChild(el);
+    });
+    // Pre-select the first match so Step 2 works even if the user doesn't click
+    const first = $("searchResults").querySelector(".book.pick");
+    if (first) { chosen = docs[0]; first.classList.add("selected"); }
+  } catch (e) {
+    offline = true;
+    chosen = { title: q, author_name: [], subject: [] };
+    $("searchNote").textContent = "Couldn't reach Open Library, so I'm using the offline sample shelf. Your book is saved as typed.";
+  }
+};
+
+// ---------- Step 2 + 3: reflect, then recommend ----------
+$("recBtn").onclick = async () => {
+  if (!chosen) {
+    const q = $("q").value.trim();
+    if (!q) { alertBox("Add a book in Step 1 first."); return; }
+    chosen = { title: q, author_name: [], subject: [] };
+  }
+  const adjectives = ["a1","a2","a3"].map(id => $(id).value.trim()).filter(Boolean);
+  const moodSubjects = adjectives.map(a => MOOD_TO_SUBJECT[a.toLowerCase()]).filter(Boolean);
+  const bookSubjects = tasteSubjects(chosen);
+  const wanted = [...new Set([...moodSubjects, ...bookSubjects])].slice(0, 5);
+
+  // Review card
+  $("reviewCard").innerHTML = `<h3 style="margin:0">${esc(chosen.title)}</h3>
+    <div class="by">${esc((chosen.author_name||[]).join(", "))}</div>
+    <div>${adjectives.map(a => `<span class="chip">${esc(a)}</span>`).join("")}</div>
+    ${$("story").value.trim() ? `<p><em>"${esc($("story").value.trim())}"</em></p>` : ""}
+    ${$("change").value.trim() ? `<p>${esc($("change").value.trim())}</p>` : ""}`;
+  $("step3").classList.remove("hidden");
+  $("recs").innerHTML = "";
+  $("recNote").textContent = "Looking past the bestseller lists…";
+  $("recBtn").disabled = true;
+
+  let pool = [];
+  if (!offline && wanted.length) {
+    try {
+      const batches = await Promise.all(wanted.map(s => olSearch({ subject: s, limit: 100, sort: "rating" }).catch(() => [])));
+      pool = batches.flat();
+    } catch (e) { offline = true; }
+    if (!pool.length) offline = true;
+  }
+  if (offline || !wanted.length) pool = SAMPLE;
+
+  const seen = new Set();
+  const myAuthors = new Set((chosen.author_name || []).map(a => a.toLowerCase()));
+  const scored = [];
+  for (const b of pool) {
+    const id = (b.title || "").toLowerCase();
+    if (!b.title || seen.has(id) || id === (chosen.title || "").toLowerCase()) continue;
+    if ((b.author_name || []).some(a => myAuthors.has(a.toLowerCase()))) continue;
+    if ((b.readinglog_count || 0) > POPULAR_LIMIT) continue;           // too famous = not hidden
+    const rawSubj = b.subject || [];
+    if (rawSubj.some(s => BESTSELLER.test(s))) continue;                // was on a bestseller list
+    if (!b.sample && (!rawSubj.some(s => LITERARY.test(s)) || rawSubj.some(s => NOT_LITERARY.test(s)))) continue;
+    seen.add(id);
+    const subj = rawSubj.map(s => s.toLowerCase());
+    const matches = wanted.filter(w => subj.some(s => s.includes(w.toLowerCase())));
+    if (!matches.length) continue;
+    const rating = b.ratings_count >= 3 ? b.ratings_average : 0;
+    scored.push({ b, matches, score: matches.length * 2 + (rating ? rating - 3 : 0) });
+  }
+  scored.sort((x, y) => y.score - x.score);
+  const top = scored.slice(0, 5);
+
+  top.forEach(({ b, matches }) => {
+    const moodHits = adjectives.filter(a => matches.includes(MOOD_TO_SUBJECT[a.toLowerCase()]));
+    const el = document.createElement("div");
+    el.className = "book";
+    el.innerHTML = `${coverHtml(b)}<div><h3>${esc(b.title)}</h3>
+      <div class="by">${esc((b.author_name||[]).slice(0,2).join(", "))}${b.first_publish_year ? " · " + b.first_publish_year : ""}</div>
+      <div class="why"><strong>Why you:</strong> ${moodHits.length ? `you called your book <em>${moodHits.map(esc).join(", ")}</em>; ` : ""}shares ${matches.map(m => `<span class="chip">${esc(m)}</span>`).join("")}</div>
+      <div class="note">${b.sample ? "From the offline sample shelf" : `Only ${b.readinglog_count || 0} reader${(b.readinglog_count || 0) === 1 ? "" : "s"} logged it on Open Library · never on the NYT list`}</div></div>`;
+    $("recs").appendChild(el);
+  });
+  $("recNote").textContent = top.length
+    ? (offline ? "Offline mode: recommendations come from a small hand-picked sample shelf." : "Data: Open Library (free, no API key). Filtered out: NYT bestsellers, books logged by more than " + POPULAR_LIMIT + " readers, children's books and self-help.")
+    : "No hidden gems matched yet. Try different words (e.g. quiet, nostalgic, healing).";
+  $("recBtn").disabled = false;
+};
+
+function alertBox(msg) { $("searchNote").textContent = msg; }
+</script>
+</body>
+</html>

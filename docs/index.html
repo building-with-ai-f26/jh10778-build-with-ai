@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>[Your Product Name] · Building with AI (Fall 2026)</title>
+  <title>Hidden Shelf · Building with AI (Fall 2026)</title>
 
   <!-- Week 1: create your PostHog account only.
        Build 2: paste your project's current PostHog web snippet here,
@@ -144,8 +144,8 @@
     <!-- HERO / PRODUCT PITCH -->
     <header>
       <span class="eyebrow">NYU Stern · Building with AI · Fall 2026</span>
-      <h1>[Your Product Name]</h1>
-      <p class="tagline">[One clear sentence: Who is this for, and what painful job does it do for them?]</p>
+      <h1>Hidden Shelf</h1>
+      <p class="tagline">For readers tired of bestseller lists: write down how a book moved you, and get the hidden gems you would never have found on your own.</p>
       <div class="cta-row">
         <a class="btn" href="#live-demo" onclick="window.posthog && posthog.capture('clicked_try_product')">See the Product →</a>
         <a class="btn btn-secondary" href="#prd">Read the Living PRD</a>
@@ -157,12 +157,11 @@
     <section id="live-demo">
       <h2>Product Showcase (Prototype / Live App / 2-Min Video)</h2>
       <p>
-        <strong>Current Status:</strong> [Build 1: local prototype / Builds 2–4: local app / Build 5: cloud app]<br />
-        <strong>Demo:</strong> [Add a screenshot or GIF now; add the live cloud app URL in Build 5.]
+        <strong>Current Status:</strong> Build 1: local prototype (a single HTML file in <code>prototype/</code>, opened in the browser).<br />
+        <strong>Demo:</strong> Pick a book you loved → fill in the reflection template → get five lesser-known books with a reason for each.
       </p>
-      <p class="meta">
-        Ask your coding agent to embed a screenshot or GIF of your local prototype for Build 1. Keep this evidence current, then add your cloud app link and two-minute video in Build 5.
-      </p>
+      <img src="prototype-screenshot.png" alt="Hidden Shelf prototype: reflection template and five hidden-gem recommendations" style="width:100%;border:1px solid var(--border);border-radius:8px;" />
+      <p class="meta">Screenshot of the Build 1 prototype running locally (offline sample-shelf mode).</p>
     </section>
 
     <!-- LIVING PRD (Updated every week!) -->
@@ -171,31 +170,31 @@
       <p class="meta">Updated every week as we test with real users and learn what works.</p>
 
       <h3>1. Target User & The Job to Be Done</h3>
-      <p><strong>Who is this for?</strong> [Name a specific, reachable person or role you have direct access to.]</p>
-      <p><strong>The painful "Before" workflow:</strong> [How do they do this today, and why is it slow, manual, or broken?]</p>
-      <p><strong>The "After" workflow with this product:</strong> [What does your tool do for them in one sitting?]</p>
+      <p><strong>Who is this for?</strong> NYU Stern MBA classmates who read at least one book a month for pleasure, starting with me. I can reach them through class, clubs and group chats.</p>
+      <p><strong>The painful "Before" workflow:</strong> After finishing a book they loved, they look for the next one on Instagram, Goodreads, Amazon or bookstore tables. Every channel pushes the same bestsellers, and star ratings say nothing about <em>why</em> a book worked for them. They give up and pick whatever is trending, or nothing.</p>
+      <p><strong>The "After" workflow with this product:</strong> In about five minutes they fill in a short reflection template (three words for the book, the one moment they still remember, what it changed in them). Hidden Shelf turns that into a taste profile and returns five lesser-known books from a large open catalog, each with a reason.</p>
 
       <h3>2. Scope & Explicit Non-Goals</h3>
       <ul>
-        <li><strong>In Scope (Core Workflow):</strong> [The 1 main workflow this product does reliably]</li>
-        <li><strong>Out of Scope #1:</strong> [Feature you are deliberately NOT building in 6 weeks]</li>
-        <li><strong>Out of Scope #2:</strong> [Feature you are deliberately NOT building in 6 weeks]</li>
-        <li><strong>Out of Scope #3:</strong> [Feature you are deliberately NOT building in 6 weeks]</li>
+        <li><strong>In Scope (Core Workflow):</strong> Pick a book you loved → write the structured reflection → get five hidden-gem recommendations with a "why you" explanation.</li>
+        <li><strong>Out of Scope #1:</strong> Points or rewards for reviews that can be used to borrow or buy books.</li>
+        <li><strong>Out of Scope #2:</strong> Social features: book clubs, following other readers, comments.</li>
+        <li><strong>Out of Scope #3:</strong> Our own book database and affiliate shopping links. We use the free Open Library catalog instead.</li>
       </ul>
 
       <h3>3. How It Works Under the Hood & Riskiest Assumption (Week 2+)</h3>
-      <p><strong>Riskiest Assumption:</strong> [What is the #1 technical or user risk that could sink this product?]</p>
-      <p><strong>Simple Architecture:</strong> [User Input] → [Your App / Server] → [AI Model / Tool] → [Output]</p>
+      <p><strong>Riskiest Assumption:</strong> That a structured reflection actually leads to better recommendations than star ratings, and that readers will take five minutes to write one.</p>
+      <p><strong>Simple Architecture:</strong> [Book + reflection] → [Browser app] → [Open Library search API; AI model from Build 2] → [Five hidden gems + reasons]</p>
 
       <h3>4. Unit Economics & Analytics Snapshot (Updated Weekly)</h3>
       <div class="grid-2">
         <div class="stat-box">
           <div class="stat-label">Cumulative Build Spend</div>
-          <div class="stat-value">[Record actual spend]</div>
+          <div class="stat-value">$0.00</div>
         </div>
         <div class="stat-box">
           <div class="stat-label">Est. Cost Per User Run</div>
-          <div class="stat-value">[Not yet estimated]</div>
+          <div class="stat-value">$0.00 (no AI calls yet)</div>
         </div>
         <div class="stat-box">
           <div class="stat-label">User Evidence (Analytics from Build 2)</div>
@@ -216,10 +215,11 @@
       <div class="log-entry">
         <h3>Build 1 · Intent.md & Throwaway Prototype (Due Nov 9)</h3>
         <ul>
-          <li><strong>What shipped:</strong> [What you actually built; link your local prototype screenshot or GIF above.]</li>
-          <li><strong>Things learned with AI:</strong> [What you learned from AI practice and Terminus Episodes 1 and 2.]</li>
-          <li><strong>What broke / changed in PRD:</strong> [Fill in]</li>
-          <li><strong>Cost & time this week:</strong> $[0.00] · [0] hours</li>
+          <li><strong>What shipped:</strong> PRD v1 and a local prototype (<code>prototype/index.html</code>). It finds the book you loved in Open Library, collects the reflection template, maps your three words to subjects, filters out books that are already popular, and returns five hidden gems with a reason. If Open Library can't be reached, it falls back to a small hand-picked sample shelf so the demo still works.</li>
+          <li><strong>What works:</strong> The full flow runs end to end in the browser with no install and no API key.</li>
+          <li><strong>Things learned with AI:</strong> The difference between Git (version history on my computer) and GitHub (where the repo lives online); creating a repo from a template; publishing <code>docs/</code> with GitHub Pages; why <code>.env</code> is a hidden file listed in <code>.gitignore</code>.</li>
+          <li><strong>What broke / changed in PRD:</strong> My first repo was created under my personal account and then transferred to the class organization, which removed my admin access, so I couldn't turn on Pages. I recreated the repo directly in the organization. I also moved from a map-based booking idea (too close to ClassPass) to Hidden Shelf. Matching is keyword-based for now; recommendations will get smarter when an AI model reads the full reflection in Build 2.</li>
+          <li><strong>Cost & time this week:</strong> $0.00 · ~4 hours</li>
         </ul>
       </div>
 

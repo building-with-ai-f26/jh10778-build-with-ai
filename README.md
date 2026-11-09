@@ -1,11 +1,12 @@
-# [Project Name]
+# Hidden Shelf
 
-> **One-line pitch:** [Who is this for, and what job does it do for them?]
+> **One-line pitch:** For readers tired of bestseller lists: write down how a book moved you, and get the hidden gems you would never have found on your own.
 
-- **Builder:** [Your Name] (`@github-handle`)
+- **Builder:** Renelle Hou (`@hannut718`)
 - **Pod:** [Pod Name / Number]
-- **Product Page & Living PRD:** [Add your GitHub Pages URL]
+- **Product Page & Living PRD:** https://building-with-ai-f26.github.io/jh10778-build-with-ai/
 - **App:** runs locally through Week 4; add a cloud URL in Build 5.
+- **Run the prototype:** open `prototype/index.html` in Chrome (no install, no API key).
 
 ## Start here: Build 1
 
