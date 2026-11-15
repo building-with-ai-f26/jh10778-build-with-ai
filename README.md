@@ -6,7 +6,7 @@
 - **Pod:** [Pod Name / Number]
 - **Product Page & Living PRD:** https://building-with-ai-f26.github.io/jh10778-build-with-ai/
 - **App:** runs locally through Week 4; add a cloud URL in Build 5.
-- **Run the prototype:** open `prototype/index.html` in Chrome (no install, no API key).
+- **Run the app:** from the repo folder, run `python3 -m http.server 8000`, then open http://localhost:8000/prototype/ (no install, no API key).
 
 ## Start here: Build 1
 
