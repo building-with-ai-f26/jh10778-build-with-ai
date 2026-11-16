@@ -168,7 +168,7 @@
       <img src="prototype-screenshot.png" alt="Hidden Shelf prototype: reflection template and five hidden-gem recommendations" style="width:100%;border:1px solid var(--border);border-radius:8px;" />
       <p class="meta">Build 1: prototype running locally (offline sample-shelf mode).</p>
       <h3>Build 2: live API call on localhost</h3>
-      <img src="build2-screenshot.png" alt="Hidden Shelf running on localhost with live Open Library recommendations" style="width:100%;border:1px solid var(--border);border-radius:8px;" />
+      <img src="hidden_shelf_screenshot.jpg" alt="Hidden Shelf running on localhost with live Open Library recommendations" style="width:100%;border:1px solid var(--border);border-radius:8px;" />
       <p class="meta">Build 2: the app running at <code>localhost:8000/prototype/</code>, returning five recommendations from a live Open Library API call.</p>
     </section>
 
@@ -209,6 +209,13 @@
       <p><strong>Simple Architecture:</strong> [Book + reflection] → [Browser app on localhost] → [Open Library Search API] → [Five hidden gems + reasons] · [PostHog analytics]</p>
       <p><strong>Cost per run:</strong> $0.00. One run makes about 2–6 Open Library requests (free, no API key) and sends about 4 PostHog events (free tier: 1M events/month). Build 3 plans to add an AI model to read the full reflection; I'll measure its token cost per run before adding it.</p>
 
+      <h3>Roadmap</h3>
+      <ul>
+        <li><strong>This semester (Builds 3–5):</strong> <em>My Bookshelf</em> tab (save notes for many books, including favorite quotes) → <em>Recommended for Me</em> tab (an AI model reads all your notes and recommends books by category, with links to buy) → cloud launch.</li>
+        <li><strong>Later:</strong> <em>Explore</em> tab (browse other readers' public bookshelves) and <em>Book Clubs</em>. Both need accounts, a shared database and privacy controls, so they are out of scope this semester. This changes PRD v1: affiliate links move in scope; book clubs stay out.</li>
+        <li><strong>New risk:</strong> reflections can be personal (e.g. a breakup), and they will be sent to an AI model. Notes stay private by default.</li>
+      </ul>
+
       <h3>4. Unit Economics & Analytics Snapshot (Updated Weekly)</h3>
       <div class="grid-2">
         <div class="stat-box">
@@ -221,7 +228,7 @@
         </div>
         <div class="stat-box">
           <div class="stat-label">User Evidence (Analytics from Build 2)</div>
-          <div class="stat-value">[Not yet measured]</div>
+          <div class="stat-value">3 visitors · 5 pageviews · 3 sessions (last 7 days, my own testing so far)</div>
         </div>
         <div class="stat-box">
           <div class="stat-label">Sponsor Call (Week 6)</div>
@@ -251,8 +258,8 @@
         <ul>
           <li><strong>What shipped:</strong> The app runs on <code>localhost</code> (<code>python3 -m http.server</code>) with live Open Library API calls. PostHog is installed on this Product Page and in the local app, with pageviews, clicks, session replay and four custom events. PRD v2 adds the biggest risk, how this build tests it, how the app works, and cost per run. <code>AGENTS.md</code> now documents the project structure and how to run it.</li>
           <li><strong>What I learned:</strong> The difference between an API call (asking another service for data) and an AI call (asking a model to reason); why the app should be served on <code>localhost</code> instead of opened as a file; that a PostHog project token is public by design, while private keys belong in <code>.env</code>.</li>
-          <li><strong>What broke / changed in PRD:</strong> Live Open Library results included children's books and bestsellers, so I added filters for NYT bestseller tags, children's books and self-help, and lowered the popularity cutoff to 500 readers. Kept AI out of this build to keep cost at $0 and test the data source first.</li>
-          <li><strong>Cost & time this week:</strong> $0.00 · [fill in] hours</li>
+          <li><strong>What broke / changed in PRD:</strong> Testing with a real book (<em>The Let Them Theory</em>, described as reflective, insightful, healing) showed the limits of keyword matching: only "healing" matched a subject, so all five reasons were the same; the results mixed genres (e.g. a fantasy novel for a book about relationships); and the "moment I remember" text isn't used at all. This is the main reason to add an AI model in Build 3. I also expanded the vision into tabs (see Roadmap): affiliate links move in scope, book clubs stay out. AI was kept out of this build to keep cost at $0 and test the data source first.</li>
+          <li><strong>Cost & time this week:</strong> $0.00 · 2–3 hours</li>
         </ul>
       </div>
 
