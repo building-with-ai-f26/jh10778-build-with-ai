@@ -152,7 +152,7 @@
       <h1>Hidden Shelf</h1>
       <p class="tagline">For readers tired of bestseller lists: write down how a book moved you, and get the hidden gems you would never have found on your own.</p>
       <div class="cta-row">
-        <a class="btn" href="#live-demo" onclick="window.posthog && posthog.capture('clicked_try_product')">See the Product →</a>
+        <a class="btn" href="app.html" onclick="window.posthog && posthog.capture('clicked_try_product')">See the Product →</a>
         <a class="btn btn-secondary" href="#prd">Read the Living PRD</a>
         <a class="btn btn-secondary" href="#build-log">Weekly Build Log</a>
       </div>
@@ -162,7 +162,7 @@
     <section id="live-demo">
       <h2>Product Showcase (Prototype / Live App / 2-Min Video)</h2>
       <p>
-        <strong>Current Status:</strong> Build 3: phone-first app on <code>localhost</code> with the full core workflow (discover → rate → save to My Log), live Open Library data and PostHog funnel events.<br />
+        <strong>Current Status:</strong> Build 3: <strong>live</strong> at <a href="app.html">building-with-ai-f26.github.io/jh10778-build-with-ai/app.html</a> (open it on your phone). Phone-first app with the full core workflow (discover → rate → save to My Log), live Open Library data and PostHog funnel events.<br />
         <strong>Demo:</strong> Pick a book you loved → fill in the reflection template → get five lesser-known books with a reason for each.
       </p>
       <img src="prototype-screenshot.png" alt="Hidden Shelf prototype: reflection template and five hidden-gem recommendations" style="width:100%;border:1px solid var(--border);border-radius:8px;" />
@@ -203,7 +203,7 @@
       </ul>
       <p><strong>How the app works:</strong></p>
       <ol>
-        <li><strong>Frontend (browser):</strong> one HTML page (<code>prototype/index.html</code>) served on <code>localhost</code>. No backend yet.</li>
+        <li><strong>Hosting (PRD v3):</strong> one static HTML page hosted on GitHub Pages (<code>docs/app.html</code>). No backend, no sign-in and no database: each reader's log is saved only in their own browser (localStorage + IndexedDB). No secret keys exist in the app. Security details: <code>SECURITY.md</code>.</li>
         <li><strong>API call 1:</strong> the book title goes to the Open Library Search API, which returns matching books and their subjects.</li>
         <li><strong>Matching:</strong> the user's three words are mapped to subjects (e.g. quiet → Solitude) and combined with the book's own subjects.</li>
         <li><strong>API calls 2–6:</strong> one Open Library search per subject; results are filtered to remove NYT bestsellers, books logged by more than 500 readers, children's books and self-help, then ranked by matching subjects and rating.</li>
@@ -267,10 +267,12 @@
       </div>
 
       <div class="log-entry">
-        <h3>Build 3 · Build.exe: The Core Workflow (Due Nov 23)</h3>
+        <h3>Build 3 · Go Live & Security Audit (Due Nov 23)</h3>
         <ul>
           <li><strong>What shipped:</strong> The core workflow now runs end to end with real books: search a book on Open Library → write the reflection → get five hidden gems → rate each one ❤️ / 😐 / 👎 → save it to My Log. My Log is a profile page (name, photo, bio, stats) with a bookshelf split into Finished / Reading / To read, a 1–10 rating with emoji guides, labels like 💅🏻 Fashion, date finished, and several favorite-quote boxes that can include a photo of the page. Data is saved in the browser (localStorage + IndexedDB for photos).</li>
           <li><strong>PostHog funnel:</strong> <code>book_searched</code> → <code>book_selected</code> → <code>reflection_submitted</code> → <code>recommendations_shown</code> → <code>recommendation_rated</code> → <code>log_entry_saved</code>, plus <code>quote_added</code>, <code>tab_opened</code>, <code>profile_updated</code> and <code>open_library_error</code>. This shows where people drop off and whether recommendations are good enough to save.</li>
+          <li><strong>Go live:</strong> The app is deployed on GitHub Pages (Beginner lane) as <code>docs/app.html</code>, so classmates can open it on their phones. It is plain HTML/JS, so no server is needed.</li>
+          <li><strong>Security audit:</strong> App type is "no AI and no database". The secret-key search of the repo, git history and live site found no real keys (only the placeholder in <code>.env.example</code>; the PostHog <code>phc_</code> token is public by design). Full results in <a href="https://github.com/building-with-ai-f26/jh10778-build-with-ai/blob/main/SECURITY.md">SECURITY.md</a>. <code>AGENTS.md</code> now has Shipping steps, an Ask-me-first list and rules from real mistakes.</li>
           <li><strong>Design:</strong> I realized Hidden Shelf is a phone app, so the prototype now looks like an iPhone (status bar, bottom tab bar, slide-up sheets) with a dark wood "book room" theme and green vines. On a real phone it fills the screen.</li>
           <li><strong>What broke / changed in PRD:</strong> The first version of the log felt crowded (fonts too big), so I shrank the type and spacing. An empty log looked broken, so the shelf now shows empty frames. I moved social features (Explore, Book Club) from "out of scope" to "placeholder tabs" so testers can see the full vision; they still have no real data. Uploading through the GitHub website worked better for me than <code>git push</code>.</li>
           <li><strong>Cost & time this week:</strong> $0.00 · ~5 hours</li>
