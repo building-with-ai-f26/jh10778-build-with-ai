@@ -162,7 +162,7 @@
     <section id="live-demo">
       <h2>Product Showcase (Prototype / Live App / 2-Min Video)</h2>
       <p>
-        <strong>Current Status:</strong> Build 2: working local app on <code>localhost</code> with live Open Library API calls and PostHog analytics.<br />
+        <strong>Current Status:</strong> Build 3: phone-first app on <code>localhost</code> with the full core workflow (discover → rate → save to My Log), live Open Library data and PostHog funnel events.<br />
         <strong>Demo:</strong> Pick a book you loved → fill in the reflection template → get five lesser-known books with a reason for each.
       </p>
       <img src="prototype-screenshot.png" alt="Hidden Shelf prototype: reflection template and five hidden-gem recommendations" style="width:100%;border:1px solid var(--border);border-radius:8px;" />
@@ -170,6 +170,9 @@
       <h3>Build 2: live API call on localhost</h3>
       <img src="hidden_shelf_screenshot.jpg" alt="Hidden Shelf running on localhost with live Open Library recommendations" style="width:100%;border:1px solid var(--border);border-radius:8px;" />
       <p class="meta">Build 2: the app running at <code>localhost:8000/prototype/</code>, returning five recommendations from a live Open Library API call.</p>
+      <h3>Build 3: phone-first core workflow</h3>
+      <img src="build3-screenshot.png" alt="Hidden Shelf Build 3: iPhone-sized app with a dark wood theme, Discover screen and five-tab bar" style="width:100%;max-width:560px;display:block;margin:0 auto;border:1px solid var(--border);border-radius:8px;" />
+      <p class="meta">Build 3: iPhone-sized app with a dark "book room" theme. Five tabs: Discover, Explore, + (log a book), Book Club and Me (profile + shelf).</p>
     </section>
 
     <!-- LIVING PRD (Updated every week!) -->
@@ -184,9 +187,9 @@
 
       <h3>2. Scope & Explicit Non-Goals</h3>
       <ul>
-        <li><strong>In Scope (Core Workflow):</strong> Pick a book you loved → write the structured reflection → get five hidden-gem recommendations with a "why you" explanation.</li>
+        <li><strong>In Scope (Core Workflow):</strong> Pick a book you loved → write the structured reflection → get five hidden-gem recommendations with a "why you" explanation → rate each one (❤️ / 😐 / 👎) → save books to My Log (status, 1–10 rating, labels, favorite quotes with photos).</li>
         <li><strong>Out of Scope #1:</strong> Points or rewards for reviews that can be used to borrow or buy books.</li>
-        <li><strong>Out of Scope #2:</strong> Social features: book clubs, following other readers, comments.</li>
+        <li><strong>Out of Scope #2 (changed in Build 3):</strong> Working social features (following readers, comments, live book clubs). The Explore and Book Club tabs now exist as placeholders so the phone layout shows the full vision, but they have no accounts or shared data yet.</li>
         <li><strong>Out of Scope #3:</strong> Our own book database and affiliate shopping links. We use the free Open Library catalog instead.</li>
       </ul>
 
@@ -207,12 +210,12 @@
         <li><strong>Output:</strong> five hidden gems, each with a "why you" reason. PostHog records the events.</li>
       </ol>
       <p><strong>Simple Architecture:</strong> [Book + reflection] → [Browser app on localhost] → [Open Library Search API] → [Five hidden gems + reasons] · [PostHog analytics]</p>
-      <p><strong>Cost per run:</strong> $0.00. One run makes about 2–6 Open Library requests (free, no API key) and sends about 4 PostHog events (free tier: 1M events/month). Build 3 plans to add an AI model to read the full reflection; I'll measure its token cost per run before adding it.</p>
+      <p><strong>Cost per run:</strong> $0.00. One run makes about 2–6 Open Library requests (free, no API key) and sends about 4 PostHog events (free tier: 1M events/month). Build 3 still uses no AI model. Build 4 plans to add one to read the full reflection; I'll measure its token cost per run before adding it.</p>
 
       <h3>Roadmap</h3>
       <ul>
-        <li><strong>This semester (Builds 3–5):</strong> <em>My Bookshelf</em> tab (save notes for many books, including favorite quotes) → <em>Recommended for Me</em> tab (an AI model reads all your notes and recommends books by category, with links to buy) → cloud launch.</li>
-        <li><strong>Later:</strong> <em>Explore</em> tab (browse other readers' public bookshelves) and <em>Book Clubs</em>. Both need accounts, a shared database and privacy controls, so they are out of scope this semester. This changes PRD v1: affiliate links move in scope; book clubs stay out.</li>
+        <li><strong>This semester (Builds 3–5):</strong> <em>My Log</em> tab (✅ shipped in Build 3: notes, ratings, labels and favorite quotes for many books) → <em>Recommended for Me</em> tab (an AI model reads all your notes and recommends books by category, with links to buy) → cloud launch.</li>
+        <li><strong>Later:</strong> <em>Explore</em> tab (browse other readers' public bookshelves) and <em>Book Clubs</em>. Both need accounts, a shared database and privacy controls, so this semester they stay as placeholder tabs (added in Build 3) without real data. This changes PRD v1: affiliate links move in scope; book clubs stay out.</li>
         <li><strong>New risk:</strong> reflections can be personal (e.g. a breakup), and they will be sent to an AI model. Notes stay private by default.</li>
       </ul>
 
@@ -266,9 +269,11 @@
       <div class="log-entry">
         <h3>Build 3 · Build.exe: The Core Workflow (Due Nov 23)</h3>
         <ul>
-          <li><strong>What shipped:</strong> [End-to-end workflow working with real inputs + PostHog funnel events]</li>
-          <li><strong>What broke / changed in PRD:</strong> [Fill in]</li>
-          <li><strong>Cost & time this week:</strong> $[0.00] · [0] hours</li>
+          <li><strong>What shipped:</strong> The core workflow now runs end to end with real books: search a book on Open Library → write the reflection → get five hidden gems → rate each one ❤️ / 😐 / 👎 → save it to My Log. My Log is a profile page (name, photo, bio, stats) with a bookshelf split into Finished / Reading / To read, a 1–10 rating with emoji guides, labels like 💅🏻 Fashion, date finished, and several favorite-quote boxes that can include a photo of the page. Data is saved in the browser (localStorage + IndexedDB for photos).</li>
+          <li><strong>PostHog funnel:</strong> <code>book_searched</code> → <code>book_selected</code> → <code>reflection_submitted</code> → <code>recommendations_shown</code> → <code>recommendation_rated</code> → <code>log_entry_saved</code>, plus <code>quote_added</code>, <code>tab_opened</code>, <code>profile_updated</code> and <code>open_library_error</code>. This shows where people drop off and whether recommendations are good enough to save.</li>
+          <li><strong>Design:</strong> I realized Hidden Shelf is a phone app, so the prototype now looks like an iPhone (status bar, bottom tab bar, slide-up sheets) with a dark wood "book room" theme and green vines. On a real phone it fills the screen.</li>
+          <li><strong>What broke / changed in PRD:</strong> The first version of the log felt crowded (fonts too big), so I shrank the type and spacing. An empty log looked broken, so the shelf now shows empty frames. I moved social features (Explore, Book Club) from "out of scope" to "placeholder tabs" so testers can see the full vision; they still have no real data. Uploading through the GitHub website worked better for me than <code>git push</code>.</li>
+          <li><strong>Cost & time this week:</strong> $0.00 · ~5 hours</li>
         </ul>
       </div>
 
